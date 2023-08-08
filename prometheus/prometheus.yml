@@ -1,0 +1,43 @@
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+
+# alertmanager와 프로메테우스를 연결하기 위해 설정 추가
+# 현재 로컬에서 9093 포트를 통해 alertmanager가 구동되고 있음
+alerting:
+  alertmanagers:
+    - static_configs:
+       - targets: ['alertmanager:9093']
+
+# 어떤 경우에 알람이 발생할 것인지 규칙을 정해놓은 rules 파일을 설정
+rule_files:
+  - "alert_rules.yml"
+
+
+scrape_configs:
+  - job_name: 'gitlab-ci-pipelines-exporter'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+    static_configs:
+      - targets: ['gitlab-ci-pipelines-exporter:8080']
+
+  - job_name: node
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  - job_name: 'gitlab-status'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+
+
+
+  - job_name: 'gitlab'
+    static_configs:
+      - targets: ['gitlab.sabo.sbx.infograb.io:443']
+    metrics_path: '/-/metrics'
+    params:
+      token: ['7yY3RMgzV-kudjjHjxK7']  # 메트릭 엔드포인트에 토큰을 쿼리 매개변수로 전달
+    scheme: https  # HTTPS 사용

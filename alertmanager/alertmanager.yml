@@ -1,0 +1,38 @@
+global:
+  resolve_timeout: 10s
+
+
+route: #라우트 경로 설정
+  group_by: ["alertname"] # prometheus.yml의 targets -labels의 label_name을 의미합니다.
+  group_wait: 30s  # inhibit 조건 발생에 대한 중복을 방지하기 위한 알림 발생 전 대기시간, 
+  group_interval: 5m # 알림 간 시간 간격 설정
+  repeat_interval: 3h # 알림 재발생 
+  receiver: 'email-notifications' # 알림 설정 대상
+
+  routes:
+    - receiver: 'email-notifications'
+      group_wait: 10s
+      match_re:
+        severity: critial
+      continue: true
+    
+    - receiver: 'slack'
+      group_wait: 10s
+
+receivers:
+- name: 'email-notifications'
+  email_configs:
+  - to: 'sabo@infograb.net'
+    from: 'sabo@infograb.net'
+    smarthost: 'smtp.gmail.com:587'
+    auth_username: 'sabo@infograb.net'
+    auth_identity: 'sabo@infograb.net'
+    auth_password: 'vimqbcctcqygummc'
+
+- name: "slack"
+  slack_configs:
+    - api_url: 'https://hooks.slack.com/services/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' 
+      send_resolved: true
+      channel: 'prj-git-devops-alert'
+      text: "summary: {{ .CommonAnnotations.summary }}\ndescription: {{ .CommonAnnotations.description }}"
+

@@ -1,0 +1,27 @@
+---
+log:
+  level: debug
+
+gitlab:
+  url: https://gitlab.sabo.sbx.infograb.io/
+  token: glpat-myZ4kk_jcnZ7EyFy6UJm
+
+
+
+# Pull jobs related metrics on all projects
+project_defaults:
+  pull:
+    refs:
+      branches:
+        regexp: ".*"
+    pipeline:
+      jobs:
+        enabled: true
+
+
+wildcards:
+  - {}
+  - owner:
+      name: root
+      kind: group
+      include_subgroups: true

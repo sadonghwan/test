@@ -1,0 +1,34 @@
+groups:
+- name: example
+  rules:
+  - alert: InstanceDown
+    expr: up == 0
+    for: 10s
+    labels:
+      severity: critical
+    annotations:
+      summary: "Instance {{ $labels.instance }} down"
+
+- name: example.rules
+  rules:
+    - alert: DiskUsageHigh
+      expr: 100 - (node_filesystem_free_bytes / node_filesystem_size_bytes) * 100 > 30
+      for: 1m  # 얼마나 오랫동안 조건을 만족해야 알람이 발생할지 설정 (1분 동안 조건 만족 시 알람 발생)
+      labels:
+        severity: critical
+      annotations:
+        summary: "Disk usage is too high on instance {{ $labels.instance }}"
+        description: "Disk usage is above 50% on instance {{ $labels.instance }}. Value: {{ $value }}%"
+
+- name: httperror
+  rules:
+  - alert: High5xxErrors
+    #    expr: http_requests_total{status=~"5.*"} >= 0
+    expr: http_requests_total{feature_category="not_owned", status="503"} >= 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High number of 5xx errors"
+      description: "The number of 5xx errors is above the threshold for {{ $labels.instance }}. Current value is {{ $value }}"
+
